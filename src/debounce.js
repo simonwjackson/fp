@@ -1,8 +1,9 @@
-import { uncurryN, apply } from './index'
+import { curry, apply } from './index'
 
 /**
  * Debounce
  *
+ * @param {Boolean} immediate If true run `fn` at the start of the timeout
  * @param  timeMs {Number} Debounce timeout
  * @param  fn {Function} Function to debounce
  *
@@ -10,34 +11,36 @@ import { uncurryN, apply } from './index'
  * @example
  *
  *		const say = (x) => console.log(x)
- *		const debouncedSay = debounce(1000, say)();
+ *		const debouncedSay = debounce_(false, 1000, say)();
  *
  *		debouncedSay("1")
  *		debouncedSay("2")
  *		debouncedSay("3")
  *
  */
-const debounce = timeMs =>
-  fn =>
-    () => {
-      let timeout
+const debounce = curry((immediate, timeMs, fn) =>
+  () => {
+    let timeout
 
-      return (...args) => {
-        const later = () => {
-          timeout = null
+    return (...args) => {
+      const later = () => {
+        timeout = null
 
+        if (!immediate)
           apply(fn, args)
-        }
 
-        const callNow = !timeout
-
-        clearTimeout(timeout)
-        timeout = setTimeout(later, timeMs)
-
-        if (callNow) apply(fn, args)
-
-        return timeout
       }
-    }
 
-export default uncurryN(2, debounce)
+      const callNow = immediate && !timeout
+
+      clearTimeout(timeout)
+      timeout = setTimeout(later, timeMs)
+
+      if (callNow)
+        apply(fn, args)
+
+      return timeout
+    }
+  })
+
+export default debounce(false)
