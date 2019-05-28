@@ -11,7 +11,7 @@ import { curry, apply } from './index'
  * @example
  *
  *		const say = (x) => console.log(x)
- *		const debouncedSay = debounce_(false, 1000, say)();
+ *		const debouncedSay = debounce(1000, say)();
  *
  *		debouncedSay("1")
  *		debouncedSay("2")
